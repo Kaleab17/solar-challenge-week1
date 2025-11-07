@@ -1,49 +1,47 @@
-class DataCleaner:
-    """
-    A reusable class for cleaning and processing solar datasets.
-    """
+import pandas as pd
 
-    def __init__(self, df):
+class DataCleaner:
+    """A class to clean solar energy data."""
+
+    def __init__(self, df: pd.DataFrame):
+        """Initialize with a dataset."""
         self.df = df
 
-    def handle_missing(self):
-        """Fill missing numeric values with the median."""
-        self.df.fillna(self.df.median(), inplace=True)
+    def handle_missing(self) -> 'DataCleaner':
+        """Fill missing values with the median for each column."""
+        self.df = self.df.fillna(self.df.median(numeric_only=True))
         return self
 
-    def remove_outliers(self, columns, threshold=3.0):
-        """Remove outliers based on Z-score."""
-        from scipy import stats
-        z = np.abs(stats.zscore(self.df[columns]))
-        self.df = self.df[(z < threshold).all(axis=1)]
+    def remove_outliers(self, columns: list[str]) -> 'DataCleaner':
+        """Remove outliers from given columns using the 5th and 95th percentiles."""
+        for col in columns:
+            if col in self.df.columns:
+                q_low = self.df[col].quantile(0.05)
+                q_high = self.df[col].quantile(0.95)
+                self.df = self.df[(self.df[col] >= q_low) & (self.df[col] <= q_high)]
         return self
 
-    def save_cleaned(self, output_path):
-        """Save cleaned data to a CSV file."""
-        self.df.to_csv(output_path, index=False)
-        print(f"Cleaned data saved to {output_path}")
-        return self
+    def save_cleaned(self, filename: str) -> None:
+        """Save the cleaned dataset to a CSV file."""
+        self.df.to_csv(filename, index=False)
+
 
 class DataValidator:
-    """
-    A small helper class to validate solar datasets before and after cleaning.
-    """
+    """A helper class to validate the dataset before and after cleaning."""
 
-    def __init__(self, df):
+    def __init__(self, df: pd.DataFrame):
+        """Initialize with the dataset."""
         self.df = df
 
-    def check_missing(self):
-        """Print number of missing values in each column."""
-        print("Missing values by column:")
-        print(self.df.isna().sum())
-        return self
+    def check_missing(self) -> int:
+        """Return the total number of missing values."""
+        missing = self.df.isna().sum().sum()
+        print(f"Missing values: {missing}")
+        return missing
 
-    def check_ranges(self):
-        """Check for negative or extreme values in solar radiation columns."""
-        bad_values = self.df[(self.df["GHI"] < 0) | (self.df["DNI"] < 0)]
-        if not bad_values.empty:
-            print(" Warning: Found invalid radiation readings.")
-        else:
-            print(" All radiation values are within valid range.")
-        return self
-
+    def check_ranges(self) -> None:
+        """Check if key columns fall within expected value ranges."""
+        if "GHI" in self.df.columns:
+            print(f"GHI range: {self.df['GHI'].min()} - {self.df['GHI'].max()}")
+        if "DNI" in self.df.columns:
+            print(f"DNI range: {self.df['DNI'].min()} - {self.df['DNI'].max()}")
