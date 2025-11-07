@@ -1,39 +1,25 @@
-"""
-utils.py
-This module contains helper functions for cleaning and analyzing solar data.
-Author: Kaleab Million
-"""
-
-import pandas as pd
-import numpy as np
-
-def handle_missing_values(df: pd.DataFrame) -> pd.DataFrame:
+class DataCleaner:
     """
-    Fill missing values in numeric columns with their median.
-
-    Args:
-        df (pd.DataFrame): The input dataset.
-
-    Returns:
-        pd.DataFrame: Dataset with missing values handled.
+    A reusable class for cleaning and processing solar datasets.
     """
-    df.fillna(df.median(), inplace=True)
-    return df
 
+    def __init__(self, df):
+        self.df = df
 
-def remove_outliers(df: pd.DataFrame, columns: list, threshold: float = 3.0) -> pd.DataFrame:
-    """
-    Remove outliers using the Z-score method.
+    def handle_missing(self):
+        """Fill missing numeric values with the median."""
+        self.df.fillna(self.df.median(), inplace=True)
+        return self
 
-    Args:
-        df (pd.DataFrame): Input dataset.
-        columns (list): Numeric columns to check for outliers.
-        threshold (float): Z-score threshold for removal (default=3.0).
+    def remove_outliers(self, columns, threshold=3.0):
+        """Remove outliers based on Z-score."""
+        from scipy import stats
+        z = np.abs(stats.zscore(self.df[columns]))
+        self.df = self.df[(z < threshold).all(axis=1)]
+        return self
 
-    Returns:
-        pd.DataFrame: Cleaned dataset.
-    """
-    from scipy import stats
-    z = np.abs(stats.zscore(df[columns]))
-    df = df[(z < threshold).all(axis=1)]
-    return df
+    def save_cleaned(self, output_path):
+        """Save cleaned data to a CSV file."""
+        self.df.to_csv(output_path, index=False)
+        print(f"Cleaned data saved to {output_path}")
+        return self
