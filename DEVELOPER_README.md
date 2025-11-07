@@ -8,15 +8,25 @@ This repository is part of the 10 Academy training challenge. It focuses on data
 
 
 
-\## How to Work on This Repo
+The main goal is to clean and analyze solar radiation data (GHI, DNI, DHI) to find which country has the best solar potential and recommend investment locations for MoonLight Energy Solutions.
 
-1\. Clone the repository.
 
-2\. Create a new branch for your feature or bug fix:
+
+---
+
+
+
+\## How to Contribute
+
+
+
+1\. Clone the repository:
 
 &nbsp;  ```bash
 
-&nbsp;  git checkout -b feature/ml
+&nbsp;  git clone https://github.com/kaleab17/solar-challenge-week1.git
+
+&nbsp;  cd solar-challenge-week1
 
 
 
