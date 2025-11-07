@@ -23,3 +23,27 @@ class DataCleaner:
         self.df.to_csv(output_path, index=False)
         print(f"Cleaned data saved to {output_path}")
         return self
+
+class DataValidator:
+    """
+    A small helper class to validate solar datasets before and after cleaning.
+    """
+
+    def __init__(self, df):
+        self.df = df
+
+    def check_missing(self):
+        """Print number of missing values in each column."""
+        print("Missing values by column:")
+        print(self.df.isna().sum())
+        return self
+
+    def check_ranges(self):
+        """Check for negative or extreme values in solar radiation columns."""
+        bad_values = self.df[(self.df["GHI"] < 0) | (self.df["DNI"] < 0)]
+        if not bad_values.empty:
+            print(" Warning: Found invalid radiation readings.")
+        else:
+            print(" All radiation values are within valid range.")
+        return self
+
