@@ -1,0 +1,14 @@
+# Virtual environment
+.venv/
+__pycache__/
+
+# Jupyter and data files
+.ipynb_checkpoints/
+data/
+*.csv
+*.xlsx
+*.json
+
+# Operating system files
+.DS_Store
+Thumbs.db
